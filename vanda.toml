@@ -1,0 +1,41 @@
+[application]
+  service_name="vanda_service"
+  api_uri="/api/v1"
+  static_uri="/statics"
+  static_dir="./webapp/vanda/build"
+  template_dir="./webapp/vanda/build"
+  upload_dir=""
+  page_size=10
+
+[network]
+  host="localhost.com:8000"
+  listen="127.0.0.1:8000"
+  auto_discovery=false
+  registry_address=""
+
+[database]
+  default_uri="postgres://postgres:123@127.0.0.1:5432/vanda_demo?sslmode=disable"
+  readonly_uri="postgres://postgres:123@127.0.0.1:5432/vanda_demo?sslmode=disable"
+  sql_max_open=10
+  sql_max_wait=30
+
+[cache]
+  kv_uri="127.0.0.1:6379"
+  kv_password=""
+  cookie_name="vanda_cookie"
+
+[broker] # kafka  
+  default_uri=""
+
+[security]
+  ssl_certificate=""
+  ssl_certificate_key=""
+  secret_key=""
+  encrypt_key=""
+  token_expiry=7200
+
+[log]
+  filename=""
+  level="debug" # error/warning/debug/info
+  rotation=true
+  maxsize=5
