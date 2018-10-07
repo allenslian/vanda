@@ -4,6 +4,7 @@
   static_uri="/statics"
   static_dir="./webapp/vanda/build"
   template_dir="./webapp/vanda/build"
+  tenant_mode="" #domain,header,url
   upload_dir=""
   page_size=10
 
@@ -17,7 +18,7 @@
   default_uri="postgres://postgres:123@127.0.0.1:5432/vanda_demo?sslmode=disable"
   readonly_uri="postgres://postgres:123@127.0.0.1:5432/vanda_demo?sslmode=disable"
   sql_max_open=10
-  sql_max_wait=30
+  sql_max_idle=30
 
 [cache]
   kv_uri="127.0.0.1:6379"

@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/spf13/viper"
 	"github.com/urfave/cli"
 
 	"github.com/allenslian/vanda/infrastructure/config"
@@ -45,27 +44,9 @@ func Execute(args []string) error {
 }
 
 func runAction(c *cli.Context) error {
-	config, err := readConfigFile()
+	config, err := config.LoadConfigFile(appName)
 	if err != nil {
 		return err
 	}
-	fmt.Println(config.Database.DefaultURI)
-	return nil
-}
-
-func readConfigFile() (*config.Configuration, error) {
-	v := viper.New()
-	v.SetConfigName(appName)
-	v.SetConfigType("toml")
-	v.AddConfigPath(".")
-	if err := v.ReadInConfig(); err != nil {
-		return nil, err
-	}
-
-	var c config.Configuration
-	if err := v.Unmarshal(&c); err != nil {
-		return nil, err
-	}
-
-	return &c, nil
+	return setup(config)
 }

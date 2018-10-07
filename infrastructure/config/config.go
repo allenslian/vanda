@@ -1,5 +1,11 @@
 package config
 
+import "github.com/spf13/viper"
+
+var (
+	config Configuration
+)
+
 type (
 	// Configuration describes all the sections in vanda configuration file.
 	Configuration struct {
@@ -21,6 +27,7 @@ type (
 		TemplateDir string `mapstructure:"template_dir"`
 		UploadDir   string `mapstructure:"upload_dir"`
 		PageSize    int    `mapstructure:"page_size"`
+		TenantMode  string `mapstructure:"tenant_mode"`
 	}
 
 	// NetworkSection describes network section in the configuration file.
@@ -36,7 +43,7 @@ type (
 		DefaultURI  string `mapstructure:"default_uri"`
 		ReadonlyURI string `mapstructure:"readonly_uri"`
 		MaxOpen     int    `mapstructure:"sql_max_open"`
-		MaxWait     int    `mapstructure:"sql_max_wait"`
+		MaxIdle     int    `mapstructure:"sql_max_idle"`
 	}
 
 	// CacheSection describes cache section in the configuration file.
@@ -68,3 +75,30 @@ type (
 		MaxSize  int    `mapstructure:"maxsize"`
 	}
 )
+
+//LoadConfigFile read configuration from the toml configuration file.
+func LoadConfigFile(appName string) (*Configuration, error) {
+	v := viper.New()
+	v.SetConfigName(appName)
+	v.SetConfigType("toml")
+	v.AddConfigPath(".")
+	if err := v.ReadInConfig(); err != nil {
+		return nil, err
+	}
+
+	if err := v.Unmarshal(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+//ExportToConfigFile creates one configuration file according to struct Configuration.
+func ExportToConfigFile() error {
+	return nil
+}
+
+//Get returns one configuration instance.
+func Get() *Configuration {
+	return &config
+}
