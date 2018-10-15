@@ -16,15 +16,22 @@ func (factory *redisFactory) GetCache() func() (*redis.Client, error) {
 		DB:       0,
 	})
 
-	var _, err = client.Ping().Result()
-	if err != nil {
-		return func() (*redis.Client, error) {
+	return func() (*redis.Client, error) {
+		var _, err = client.Ping().Result()
+		if err != nil {
 			return nil, err
 		}
-	}
-	return func() (*redis.Client, error) {
 		return client, nil
 	}
+}
+
+func (factory *redisFactory) Close() error {
+	client, err := factory.GetCache()()
+	if err != nil {
+		return err
+	}
+
+	return client.Close()
 }
 
 func newRedisFactory(option *Option) Factory {

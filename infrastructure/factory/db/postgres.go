@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 
+	//import postgres driver
 	_ "github.com/lib/pq"
 )
 
@@ -12,24 +13,30 @@ type postgresFactory struct {
 
 func (factory *postgresFactory) GetReadonlyDB() func() (ReadonlyDB, error) {
 	var db, err = sql.Open("postgres", factory.option.DefaultURI)
-	if err == nil {
+	if db != nil {
 		db.SetMaxIdleConns(factory.option.MaxIdleConns)
 		db.SetMaxOpenConns(factory.option.MaxOpenConns)
 	}
 
 	return func() (ReadonlyDB, error) {
+		if err = db.Ping(); err != nil {
+			return nil, err
+		}
 		return db, err
 	}
 }
 
 func (factory *postgresFactory) GetDefaultDB() func() (DefaultDB, error) {
 	var db, err = sql.Open("postgres", factory.option.DefaultURI)
-	if err == nil {
+	if db != nil {
 		db.SetMaxIdleConns(factory.option.MaxIdleConns)
 		db.SetMaxOpenConns(factory.option.MaxOpenConns)
 	}
 
 	return func() (DefaultDB, error) {
+		if err = db.Ping(); err != nil {
+			return nil, err
+		}
 		return db, err
 	}
 }

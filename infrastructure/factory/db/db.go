@@ -55,9 +55,7 @@ type (
 var (
 	//New creates one database factory.
 	New func(option *Option) Factory
-)
 
-var (
 	factory Factory
 )
 
@@ -69,7 +67,7 @@ func InitializeDB(option *Option) {
 //GetDefaultDB will return one writable database instance.
 func GetDefaultDB() (DefaultDB, error) {
 	if factory == nil {
-		return nil, ErrMissingDBOption
+		return nil, errMissingOption
 	}
 	return factory.GetDefaultDB()()
 }
@@ -77,7 +75,7 @@ func GetDefaultDB() (DefaultDB, error) {
 //GetReadonlyDB will return one readonly database instance.
 func GetReadonlyDB() (ReadonlyDB, error) {
 	if factory == nil {
-		return nil, ErrMissingDBOption
+		return nil, errMissingOption
 	}
 	return factory.GetReadonlyDB()()
 }
@@ -85,7 +83,7 @@ func GetReadonlyDB() (ReadonlyDB, error) {
 //Close will close all the instances.
 func Close() []error {
 	if factory == nil {
-		return []error{ErrMissingDBOption}
+		return []error{errMissingOption}
 	}
 	return factory.Close()
 }

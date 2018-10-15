@@ -5,6 +5,6 @@ import (
 )
 
 var (
-	//ErrMissingDBOption indicates system didn't find database setting.
-	ErrMissingDBOption = errors.New("Missing database option")
+	//ErrMissingOption indicates system didn't find database setting.
+	errMissingOption = errors.New("Missing database option")
 )

@@ -4,12 +4,14 @@
   static_uri="/statics"
   static_dir="./webapp/vanda/build"
   template_dir="./webapp/vanda/build"
-  tenant_mode="" #domain,header,url
+  tenant_mode="domain" #domain,header,url
+  tenant_key="tenant.key"  #if tenant_mode is header or url, it will be used.
   upload_dir=""
   page_size=10
 
 [network]
   host="localhost.com:8000"
+  black_list = []
   listen="127.0.0.1:8000"
   auto_discovery=false
   registry_address=""
