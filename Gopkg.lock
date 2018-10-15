@@ -282,6 +282,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/gin-gonic/gin",
+    "github.com/json-iterator/go",
     "github.com/lib/pq",
     "github.com/smartystreets/goconvey/convey",
     "github.com/spf13/viper",

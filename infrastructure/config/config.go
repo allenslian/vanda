@@ -1,9 +1,16 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"path/filepath"
+	"strings"
+	"sync"
+
+	"github.com/spf13/viper"
+)
 
 var (
 	config Configuration
+	once   sync.Once
 )
 
 type (
@@ -28,14 +35,16 @@ type (
 		UploadDir   string `mapstructure:"upload_dir"`
 		PageSize    int    `mapstructure:"page_size"`
 		TenantMode  string `mapstructure:"tenant_mode"`
+		TenantKey   string `mapstructure:"tenant_key"`
 	}
 
 	// NetworkSection describes network section in the configuration file.
 	networkSection struct {
-		Host            string `mapstructure:"host"`
-		Listen          string `mapstructure:"listen"`
-		AutoDiscovery   bool   `mapstructure:"auto_discovery"`
-		RegistryAddress string `mapstructure:"registry_address"`
+		Host            string   `mapstructure:"host"`
+		Listen          string   `mapstructure:"listen"`
+		BlackList       []string `mapstructure:"black_list"`
+		AutoDiscovery   bool     `mapstructure:"auto_discovery"`
+		RegistryAddress string   `mapstructure:"registry_address"`
 	}
 
 	// DatabaseSection describes database section in the configuration file.
@@ -77,20 +86,36 @@ type (
 )
 
 //LoadConfigFile read configuration from the toml configuration file.
-func LoadConfigFile(appName string) (*Configuration, error) {
-	v := viper.New()
-	v.SetConfigName(appName)
-	v.SetConfigType("toml")
-	v.AddConfigPath(".")
-	if err := v.ReadInConfig(); err != nil {
-		return nil, err
-	}
+func LoadConfigFile(configPath string) (*Configuration, error) {
+	var errConfig error
+	once.Do(func() {
+		v := viper.New()
+		v.SetConfigType("toml")
+		if filepath.IsAbs(configPath) {
+			name := strings.ToLower(filepath.Base(configPath))
+			if !strings.HasSuffix(name, ".toml") {
+				errConfig = ErrConfigFileFormat
+				return
+			}
+			v.SetConfigName(strings.TrimSuffix(name, ".toml"))
+			dir := filepath.Dir(configPath)
+			v.AddConfigPath(dir)
+		} else {
+			v.SetConfigName(configPath)
+			v.AddConfigPath(".")
+		}
 
-	if err := v.Unmarshal(&config); err != nil {
-		return nil, err
-	}
+		if err := v.ReadInConfig(); err != nil {
+			errConfig = err
+			return
+		}
 
-	return &config, nil
+		if err := v.Unmarshal(&config); err != nil {
+			errConfig = err
+			return
+		}
+	})
+	return &config, errConfig
 }
 
 //ExportToConfigFile creates one configuration file according to struct Configuration.

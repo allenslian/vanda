@@ -44,9 +44,17 @@ func Execute(args []string) error {
 }
 
 func runAction(c *cli.Context) error {
-	config, err := config.LoadConfigFile(appName)
+	var cfg *config.Configuration
+	var err error
+
+	if configFile == "" {
+		cfg, err = config.LoadConfigFile(appName)
+	} else {
+		cfg, err = config.LoadConfigFile(configFile)
+	}
+
 	if err != nil {
 		return err
 	}
-	return setup(config)
+	return setup(cfg)
 }

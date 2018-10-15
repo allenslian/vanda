@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"log"
 
 	"github.com/gin-gonic/gin"
 
@@ -21,11 +22,13 @@ const (
 
 //DefaultDBMiddleware adds default db instance into context.
 func DefaultDBMiddleware() gin.HandlerFunc {
-	instance, err := db.GetDefaultDB()
-	if err != nil {
-		panic(err)
-	}
 	return func(c *gin.Context) {
+		instance, err := db.GetDefaultDB()
+		if err != nil {
+			log.Printf("DefaultDBMiddleware:GetDefaultDB error:%s.\n", err.Error())
+			c.Next()
+			return
+		}
 		c.Set(vandadb, instance)
 		c.Next()
 	}
@@ -33,18 +36,21 @@ func DefaultDBMiddleware() gin.HandlerFunc {
 
 //ReadonlyDBMiddleware adds readonly db instance into context.
 func ReadonlyDBMiddleware() gin.HandlerFunc {
-	instance, err := db.GetReadonlyDB()
-	if err != nil {
-		panic(err)
-	}
 	return func(c *gin.Context) {
+		instance, err := db.GetReadonlyDB()
+		if err != nil {
+			log.Printf("ReadonlyDBMiddleware:GetReadonlyDB error:%s.\n", err.Error())
+			c.Next()
+			return
+		}
+
 		c.Set(vandadb, instance)
 		c.Next()
 	}
 }
 
-// GetDefaultDB return one instance from context.
-func GetDefaultDB(c *gin.Context) (db.DefaultDB, bool) {
+// GetDefaultDBFromContext return one instance from context.
+func GetDefaultDBFromContext(c *gin.Context) (db.DefaultDB, bool) {
 	value, exist := c.Get(vandadb)
 	if !exist {
 		return nil, false
@@ -56,8 +62,8 @@ func GetDefaultDB(c *gin.Context) (db.DefaultDB, bool) {
 	return vandaDB, true
 }
 
-// GetReadonlyDB return one instance from context.
-func GetReadonlyDB(c *gin.Context) (db.ReadonlyDB, bool) {
+// GetReadonlyDBFromContext return one instance from context.
+func GetReadonlyDBFromContext(c *gin.Context) (db.ReadonlyDB, bool) {
 	value, exist := c.Get(vandadb)
 	if !exist {
 		return nil, false
